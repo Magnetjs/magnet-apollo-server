@@ -7,6 +7,6 @@ let app = await magnet([
   fromM('config'),
   fromM('bunyan'),
   fromM('folder-loader'),
-  fromM('graphql-server'),
+  fromM('apollo-server'),
 ]);
 ```
