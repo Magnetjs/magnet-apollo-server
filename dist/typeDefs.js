@@ -1,25 +1,35 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const requireAll = require("require-all");
-const path = require("path");
 const flow = require("lodash/fp/flow");
-const mapValues = require("lodash/fp/mapValues");
+const mapValuesFp = require("lodash/fp/mapValues");
+const map = require("lodash/fp/map");
 const values = require("lodash/fp/values");
-function default_1(schemasDir, { config }) {
-    const getSchema = (pSchemas, field) => flow(mapValues((schema) => {
+const filter = require("lodash/fp/filter");
+const compact = require("lodash/fp/compact");
+const join = require("lodash/fp/join");
+const mapValues = require("lodash/mapValues");
+function default_1(schemasDir) {
+    const getSchema = (pSchemas, field) => flow(mapValuesFp(field), values, filter((res) => res !== '\n'), compact, join(''))(pSchemas);
+    const buildGraphqlDefTypes = flow(map((type) => {
+        const combinedType = getSchema(typeDefs, type);
+        if (type === 'Schema') {
+            return combinedType;
+        }
+        else if (combinedType) {
+            return `type ${type} { ${combinedType} }`;
+        }
+    }), compact);
+    let typeDefs = requireAll(schemasDir);
+    typeDefs = mapValues(typeDefs, (schema) => {
         return schema.default || schema;
-    }), mapValues(field), values)(pSchemas);
-    let schemas = requireAll(path.join(config.baseDirPath, schemasDir));
-    const combinedQuery = getSchema(schemas, 'Query');
-    const queries = combinedQuery.length ? `type Query { ${combinedQuery.join('')} }` : '';
-    const combinedMutation = getSchema(schemas, 'Mutation');
-    const mutations = combinedMutation.length ? `type Mutation { ${combinedMutation.join('')} }` : '';
-    const td = getSchema(schemas, 'Schema');
-    td.push(`${queries} ${mutations}`);
-    // type Subscription {
-    //   postUpvoted: Profile
-    // }
-    return td;
+    });
+    return buildGraphqlDefTypes([
+        'Query',
+        'Mutation',
+        'Subscription',
+        'Schema'
+    ]);
 }
 exports.default = default_1;
 //# sourceMappingURL=typeDefs.js.map

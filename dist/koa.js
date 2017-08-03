@@ -10,15 +10,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const module_1 = require("magnet-core/module");
 const graphql_tools_1 = require("graphql-tools");
-const graphql_server_koa_1 = require("graphql-server-koa");
+const apollo_server_koa_1 = require("apollo-server-koa");
 const graphql_apollo_errors_1 = require("graphql-apollo-errors");
 const path = require("path");
 const omit = require("lodash/omit");
 const resolvers_1 = require("./resolvers");
 const typeDefs_1 = require("./typeDefs");
 class MagnetGraphqlServerKoa extends module_1.Module {
-    get moduleName() { return 'graphql_server'; }
-    get defaultConfig() { return __dirname; }
+    init() {
+        this.moduleName = 'apollo-server';
+        this.defaultConfig = __dirname;
+    }
     setup() {
         return __awaiter(this, void 0, void 0, function* () {
             const formatError = graphql_apollo_errors_1.formatErrorGenerator({
@@ -42,12 +44,16 @@ class MagnetGraphqlServerKoa extends module_1.Module {
                     onFinalError: (finalError) => { this.log.error(finalError.message); }
                 }
             });
-            const scalars = omit(require(path.join(this.app.config.baseDirPath, this.config.scalarFile)).default, 'Schema');
+            const typeDefs = typeDefs_1.default(path.join(this.app.config.baseDirPath, this.config.schemasDir));
+            if (!typeDefs.length) {
+                this.log.error('No schema definition');
+                return;
+            }
             const schema = graphql_tools_1.makeExecutableSchema({
-                typeDefs: typeDefs_1.default(this.config.schemasDir, this.app),
-                resolvers: Object.assign(scalars, resolvers_1.default(this.config.resolversDir, this.app))
+                typeDefs,
+                resolvers: Object.assign(omit(require(path.join(this.app.config.baseDirPath, this.config.scalarFile)).default, 'Schema'), resolvers_1.default(this.config.resolversDir, this.app))
             });
-            this.insert(graphql_server_koa_1.graphqlKoa((ctx) => __awaiter(this, void 0, void 0, function* () {
+            this.insert(apollo_server_koa_1.graphqlKoa((ctx) => __awaiter(this, void 0, void 0, function* () {
                 return ({
                     formatError,
                     schema,
