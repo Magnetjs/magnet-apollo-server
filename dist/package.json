@@ -1,6 +1,6 @@
 {
   "name": "magnet-apollo-server",
-  "version": "1.0.2",
+  "version": "1.2.0",
   "description": "Magnet adapter for graphql-server",
   "keywords": [
     "magnet",
@@ -19,13 +19,15 @@
     "build": "fly buildAndCopy",
     "dist": "npm run build && cd dist && npm publish"
   },
-  "dependencies": {
-    "graphql": "^0.10.5",
+  "peerDependencies": {
+    "graphql": "^0.12.3",
     "graphql-apollo-errors": "^2.0.2",
     "graphql-server-koa": "^1.0.5",
-    "graphql-tools": "^1.0.0",
+    "graphql-tools": "^2.18.0",
+    "magnet-core": "^4.0.1"
+  },
+  "dependencies": {
     "lodash": "^4.17.4",
-    "magnet-core": "^4.0.1",
     "require-all": "^2.2.0"
   },
   "devDependencies": {
