@@ -29,16 +29,10 @@ class MagnetGraphqlServerKoa extends module_1.Module {
                 this.log.error('No schema definition');
                 return;
             }
-            const schema = graphql_tools_1.makeExecutableSchema({
-                typeDefs,
-                resolvers: Object.assign(omit(require(path.join(this.app.config.baseDirPath, this.config.scalarFile)).default, 'Schema'), resolvers_1.default(this.config.resolversDir, this.app))
-            });
+            const schema = graphql_tools_1.makeExecutableSchema(Object.assign({ typeDefs, resolvers: Object.assign(omit(require(path.join(this.app.config.baseDirPath, this.config.scalarFile)).default, 'Schema'), resolvers_1.default(this.config.resolversDir, this.app)) }, this.config));
             this.insert(apollo_server_koa_1.graphqlKoa((ctx) => __awaiter(this, void 0, void 0, function* () {
-                return ({
-                    formatError,
-                    schema,
-                    context: { state: ctx.state }
-                });
+                return (Object.assign({ formatError,
+                    schema, context: { state: ctx.state } }, this.config));
             })), 'graphqlServerKoa');
         });
     }

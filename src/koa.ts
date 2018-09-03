@@ -38,7 +38,8 @@ export default class MagnetGraphqlServerKoa extends Module {
     this.insert(graphqlKoa(async (ctx) => ({
       formatError,
       schema,
-      context: { state: ctx.state }
+      context: { state: ctx.state },
+      ...this.config
     })), 'graphqlServerKoa')
   }
 }
