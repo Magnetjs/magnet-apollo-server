@@ -31,7 +31,8 @@ export default class MagnetGraphqlServerKoa extends Module {
           'Schema'
         ),
         resolvers(this.config.resolversDir, this.app)
-      )
+      ),
+      ...this.config
     })
 
     this.insert(graphqlKoa(async (ctx) => ({
